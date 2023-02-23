@@ -1,0 +1,8 @@
+name: 'reusable'
+on:
+  pull_request:
+jobs:
+  reusable:
+    uses: "./testdata/_3.yml"
+    with:
+      input: a
