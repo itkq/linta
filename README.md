@@ -63,4 +63,3 @@ There's no magic!
 
 ## TODO
 - Support workflow-level permissions
-- Ignore violation

@@ -47,8 +47,7 @@ func (l *linter) Errors() []LintErr {
 	return l.checker.errs
 }
 
-func (l *linter) Lint(path string) error {
-	walker := newWorkflowWalker()
+func (l *linter) lint(walker *workflowWalker, path string) error {
 	if err := walker.walk(path, l.checker); err != nil {
 		return err
 	}
@@ -78,6 +77,7 @@ func (c *checker) onJob(path string, job *actionlint.Job) error {
 	derivedPermissions := c.deriveJobPermissions(actions)
 
 	excessivePermissions := currentPermissions.excessivePermissions(*derivedPermissions)
+	excessivePermissions = c.filterIgnoredPermissions(path, job.ID.Value, excessivePermissions)
 	if len(excessivePermissions) > 0 {
 		for k, p := range excessivePermissions {
 			c.errs = append(c.errs, newLintErr(fmt.Sprintf("job %s has excessive permission: %s:%s", job.ID.Value, k, p), path, p.pos))
@@ -88,6 +88,7 @@ func (c *checker) onJob(path string, job *actionlint.Job) error {
 		currentPermissions.setDefault()
 	}
 	insufficientPermissions := currentPermissions.insufficientPermissions(*derivedPermissions)
+	insufficientPermissions = c.filterIgnoredPermissions(path, job.ID.Value, insufficientPermissions)
 	if len(insufficientPermissions) > 0 {
 		for k, p := range insufficientPermissions {
 			c.errs = append(c.errs, newLintErr(fmt.Sprintf("job %s has insufficient permission: %s:%s", job.ID.Value, k, p), path, p.pos))
@@ -125,6 +126,17 @@ func (c *checker) deriveJobPermissions(stepActions []stepAction) *jobPermissions
 	}
 
 	return derivedPermissions
+}
+
+func (c *checker) filterIgnoredPermissions(path, job string, p jobPermissions) jobPermissions {
+	permissions := make(jobPermissions)
+	for k, v := range p {
+		if !c.config.ignoreEnabled(path, job, fmt.Sprintf("%s:%s", k, v.scope)) {
+			permissions[k] = v
+		}
+	}
+
+	return permissions
 }
 
 // https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses

@@ -124,7 +124,7 @@ func runAction(ctx *cli.Context) error {
 		return err
 	}
 	if ctx.Bool("debug") {
-		fmt.Fprintf(os.Stderr, "config: %v\n", config)
+		fmt.Fprintf(os.Stderr, "%v\n", config)
 	}
 
 	workflows := ctx.Args().Slice()
@@ -137,9 +137,10 @@ func runAction(ctx *cli.Context) error {
 	}
 
 	var errs []LintErr
+	walker := newWorkflowWalker()
 	for _, w := range workflows {
 		linter := newLinter(config)
-		if err := linter.Lint(w); err != nil {
+		if err := linter.lint(walker, w); err != nil {
 			return err
 		}
 		errs = append(errs, linter.Errors()...)

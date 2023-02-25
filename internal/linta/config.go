@@ -15,18 +15,52 @@ var builtinConfig string
 
 type Config struct {
 	Repositories map[string]*PermissionConfig `yaml:"repositories"`
+	Ignores      map[string]*IgnoreConfig     `yaml:"ignores"`
 }
 
 func (c *Config) String() string {
 	var b strings.Builder
 
-	b.WriteString("\n")
 	for k, v := range c.Repositories {
 		b.WriteString(fmt.Sprintf("[%s]\n", k))
-		b.WriteString(v.String())
+		b.WriteString(fmt.Sprintf("- %s", v))
+	}
+
+	for k, v := range c.Ignores {
+		b.WriteString(fmt.Sprintf("[%s]\n", k))
+		for j, w := range *v {
+			b.WriteString(fmt.Sprintf("- %s\n", j))
+			for _, ww := range w {
+				b.WriteString(fmt.Sprintf("  - %s\n", ww))
+			}
+		}
 	}
 
 	return b.String()
+}
+
+func (c *Config) ignoreEnabled(path, job, perm string) bool {
+	if c.Ignores == nil {
+		return false
+	}
+
+	cc, ok := c.Ignores[path]
+	if !ok {
+		return false
+	}
+
+	jc, ok := (*cc)[job]
+	if !ok {
+		return false
+	}
+
+	for _, p := range jc {
+		if p == perm {
+			return true
+		}
+	}
+
+	return false
 }
 
 type PermissionConfig map[string]string
@@ -40,6 +74,8 @@ func (c *PermissionConfig) String() string {
 
 	return b.String()
 }
+
+type IgnoreConfig map[string][]string
 
 func newConfig() *Config {
 	return &Config{
