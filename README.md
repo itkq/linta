@@ -2,45 +2,51 @@
 
 GitHub Actions' permissions linter.
 
+https://user-images.githubusercontent.com/8341422/221356688-69144e84-1e43-46bb-a642-59bc4d8feff3.mov
+
 ## Usage
 
 ```
-$ ./linta init testdata/*
-Created .linta.yml
-$ cat .linta.yml
-repositories:
-    actions/checkout:
-        contents: read
-    actions/labeler:
-        contents: read
-        pull-requests: write
-    actions/setup-node: {}
-    aws-actions/configure-aws-credentials:
-        id-token: write
-$ cat testdata/1.yml
-name: 'basic'
+$ linta help
+NAME:
+   linta - A linter for GitHub Actions' permissions
 
-on:
-  push:
+USAGE:
+   linta [global options] command [command options] [arguments...]
 
-jobs:
-  1:
-    runs-on: ubuntu-latest
-    permissions:
-      action: write
-      contents: write
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/configure-aws-credentials@v1
-      - uses: actions/labeler@v3
-$ ./linta run testdata/1.yml
-./testdata/1.yml:10:15 job 1 has excessive permission: action:write
-./testdata/1.yml:11:17 job 1 has excessive permission: contents:write
-./testdata/1.yml:16:15 job 1 has insufficient permission: pull-requests:write (required by actions/labeler)
-./testdata/1.yml:15:15 job 1 has insufficient permission: id-token:write (required by aws-actions/configure-aws-credentials)
-$ echo $?
-1
+COMMANDS:
+   init     Initialize config file
+   run      Run linter
+   version  Version of a tool
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --debug     Enable debug mode (default: false)
+   --help, -h  show help
+
+$ linta init --help
+NAME:
+   linta init - Initialize config file
+
+USAGE:
+   linta init [command options] [arguments...]
+
+OPTIONS:
+   --output-path PATH, -o PATH  Write configuration to PATH
+   --overwrite                  Overwrite existing configuration file (default: false)
+   --help, -h                   show help
+
+$ linta run --help
+NAME:
+   linta run - Run linter
+
+USAGE:
+   linta run [command options] [arguments...]
+
+OPTIONS:
+   --config-path PATH, -c PATH  Load configuration from PATH
+   --format value, -f value     Output format. One of: json, text (default) (default: "text")
+   --help, -h                
 ```
 
 ## How it works
@@ -57,3 +63,4 @@ There's no magic!
 
 ## TODO
 - Support workflow-level permissions
+- Ignore violation
