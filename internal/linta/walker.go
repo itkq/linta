@@ -78,8 +78,6 @@ func (r workflowWalker) walk(path string, p workflowProcessor) error {
 				if err := r.recordWorkflowCall(wfc); err != nil {
 					return err
 				}
-			} else {
-				// fmt.Printf("skipping %s\n", wfc.Uses.Value)
 			}
 		}
 	}
