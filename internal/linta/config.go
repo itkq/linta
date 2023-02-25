@@ -162,8 +162,10 @@ func (c Config) validate() error {
 			return fmt.Errorf("invalid repository name: %s", r)
 		}
 
-		if err := pc.validate(); err != nil {
-			return err
+		if pc != nil {
+			if err := pc.validate(); err != nil {
+				return err
+			}
 		}
 	}
 
