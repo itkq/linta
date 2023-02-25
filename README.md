@@ -5,6 +5,18 @@ GitHub Actions' permissions linter.
 ## Usage
 
 ```
+$ ./linta init testdata/*
+Created .linta.yml
+$ cat .linta.yml
+repositories:
+    actions/checkout:
+        contents: read
+    actions/labeler:
+        contents: read
+        pull-requests: write
+    actions/setup-node: {}
+    aws-actions/configure-aws-credentials:
+        id-token: write
 $ cat testdata/1.yml
 name: 'basic'
 
@@ -22,12 +34,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: aws-actions/configure-aws-credentials@v1
       - uses: actions/labeler@v3
-$ go run . ./testdata/1.yml
-excessive permission (job:1): action:write
-excessive permission (job:1): contents:write
-insufficient permission (job:1): id-token:write (aws-actions/configure-aws-credentials)
-insufficient permission (job:1): pull-requests:write (actions/labeler)
-exit status 1
+$ ./linta run testdata/1.yml
+./testdata/1.yml:10:15 job 1 has excessive permission: action:write
+./testdata/1.yml:11:17 job 1 has excessive permission: contents:write
+./testdata/1.yml:16:15 job 1 has insufficient permission: pull-requests:write (required by actions/labeler)
+./testdata/1.yml:15:15 job 1 has insufficient permission: id-token:write (required by aws-actions/configure-aws-credentials)
+$ echo $?
+1
 ```
 
 ## How it works
@@ -35,15 +48,12 @@ exit status 1
 Just compare the permissions by knowledge-based config like:
 
 ```yaml
-- repository: "actions/checkout"
-  permissions:
+repositories:
+  "actions/checkout":
     contents: "read"
 ```
 
 There's no magic!
 
 ## TODO
-- Support custom configuration
-- Support flexible inputs
 - Support workflow-level permissions
-- Output problem position

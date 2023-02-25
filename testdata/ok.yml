@@ -1,0 +1,14 @@
+name: 'ok'
+
+on:
+  push:
+
+jobs:
+  ok:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v1

@@ -1,0 +1,8 @@
+repositories:
+  actions/checkout:
+    contents: read
+  actions/labeler:
+    contents: read
+    pull-requests: write
+  aws-actions/configure-aws-credentials:
+    id-token: write
