@@ -45,8 +45,8 @@ USAGE:
 
 OPTIONS:
    --config-path PATH, -c PATH  Load configuration from PATH
-   --format value, -f value     Output format. One of: json, text (default) (default: "text")
-   --help, -h                
+   --format value, -f value     Output format. One of: [json, text] (default: "text")
+   --help, -h
 ```
 
 ## How it works

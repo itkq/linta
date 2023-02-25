@@ -55,7 +55,7 @@ func commands() []*cli.Command {
 				},
 				&cli.StringFlag{
 					Name:    "format",
-					Usage:   "Output format. One of: json, text (default)",
+					Usage:   "Output format. One of: [json, text]",
 					Aliases: []string{"f"},
 					Value:   "text",
 				},
